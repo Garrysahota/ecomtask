@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
         backgroundColor: THEME.WHITE,
         borderWidth: 1,
         borderColor: THEME.WHITE,
-        opacity: 0.35,
+        // opacity: 0.35,
         marginHorizontal: scale(4),
     },
     dotActive: {
