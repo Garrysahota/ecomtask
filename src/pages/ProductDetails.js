@@ -1,5 +1,5 @@
-import React, { useRef, useState, useMemo } from 'react';
-import { Animated, Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
+import { Alert, Animated, Dimensions, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { THEME } from '../constants/theme';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
@@ -8,19 +8,41 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import BagIcon from '../assets/svg/BagIcon';
 import MinuesIcon from '../assets/svg/MinuesIcon';
 import PlusIcon from '../assets/svg/PlusIcon';
+import { ApiHelper } from '../helpers/api/apiHelper';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const ProductDetails = () => {
     const navigation = useNavigation();
     const route = useRoute();
-    const item = route?.params?.product ?? {};
+    const productId = route?.params?.product;
+
+    const [product, setProduct] = useState([]);
+
+    const productDetails = async () => {
+        try {
+            let res = await ApiHelper.post('task_api.php', { product_id: productId }, true);
+            console.log('response:::', res);
+            if (res?.status) {
+                setProduct(res?.data[0]);
+            } else {
+                Alert.alert(res?.message);
+            }
+
+        } catch (error) {
+            console.log('err:', error);
+        }
+    };
+
+    useEffect(() => {
+        productDetails()
+    }, [])
 
     const images = useMemo(() => {
-        if (Array.isArray(item?.images) && item.images.length) return item.images;
-        if (item?.thumbnail) return [item.thumbnail];
+        if (Array.isArray(product?.images) && product.images.length) return product.images;
+        if (product?.thumbnail) return [product.thumbnail];
         return [];
-    }, [item]);
+    }, [product]);
 
     const HORIZONTAL_PADDING = moderateScale(24);
     const ITEM_SPACING = scale(12);
@@ -124,12 +146,12 @@ const ProductDetails = () => {
             <View style={styles.detailsWrap}>
                 <View style={styles.rowBetween}>
                     <View style={{ width: '60%' }}>
-                        <Text style={styles.text14} numberOfLines={2}>{item?.title ?? 'Product title'}</Text>
-                        <Text style={styles.categoryText}> {item?.brand ?? item?.category}</Text>
+                        <Text style={styles.text14} numberOfLines={2}>{product?.title ?? 'Product title'}</Text>
+                        <Text style={styles.categoryText}> {product?.brand ?? product?.category}</Text>
                     </View>
                     <View style={{ width: '40%' }}>
                         <Text style={styles.text14}>Price</Text>
-                        <Text style={styles.priceText}>₱ {item?.price ?? '0.00'}</Text>
+                        <Text style={styles.priceText}>₱ {product?.price ?? '0.00'}</Text>
                     </View>
                 </View>
 
@@ -146,7 +168,7 @@ const ProductDetails = () => {
 
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Description</Text>
-                    <Text style={styles.descriptionText} numberOfLines={4}>{item?.description ?? 'No description available.'}</Text>
+                    <Text style={styles.descriptionText} numberOfLines={4}>{product?.description ?? 'No description available.'}</Text>
                 </View>
 
                 <View style={styles.ctaRow}>
@@ -170,21 +192,16 @@ const styles = StyleSheet.create({
         backgroundColor: THEME.BACKGROUND,
     },
     header: {
-        paddingHorizontal: moderateScale(12),
-        paddingTop: moderateScale(12),
+        paddingHorizontal: moderateScale(10),
+        paddingTop: scale(10),
         zIndex: 10,
     },
     backBtn: {
-        width: scale(44),
-        height: scale(44),
-        borderRadius: scale(44),
+        width: scale(45),
+        height: scale(45),
+        borderRadius: scale(45),
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 2 },
-        elevation: 3,
     },
     carouselWrap: {
         flex: 1.0,

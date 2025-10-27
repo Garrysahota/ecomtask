@@ -7,9 +7,9 @@ export const ApiHelper = {
         return fetchClient(`${url}${query ? `?${query}` : ''}`, 'GET');
     },
 
-    post: (url, data) => fetchClient(url, 'POST', data),
+    post: (url, data, isFormData = false) => fetchClient(url, 'POST', data, {}, isFormData),
 
-    put: (url, data) => fetchClient(url, 'PUT', data),
+    put: (url, data, isFormData = false) => fetchClient(url, 'PUT', data, {}, isFormData),
 
     del: (url) => fetchClient(url, 'DELETE'),
 };

@@ -45,7 +45,7 @@ const ProductItem = memo(({ item, isGrid }) => {
     const containerStyle = isGrid ? { width: (SCREEN_WIDTH - PADDING * 2 - GAP) / 2 } : { width: SCREEN_WIDTH - PADDING * 2 };
 
     return (
-        <TouchableOpacity onPress={() => navigation.navigate('ProductDetails', { product: item })}>
+        <TouchableOpacity onPress={() => navigation.navigate('ProductDetails', { product: item?.id })}>
 
             <Animated.View
                 style={[

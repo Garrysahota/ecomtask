@@ -1,11 +1,12 @@
+// src/api/fetchClient.js
 
 const BASE_URL = 'https://www.io.pixelsoftwares.com/';
 
-export const fetchClient = async (endpoint, method = 'GET', data = null, headers = {}) => {
+export const fetchClient = async (endpoint, method = 'GET', data = null, headers = {}, isFormData = false) => {
     try {
         const defaultHeaders = {
-            'Content-Type': 'application/json',
             apikey: `pixel`,
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             ...headers,
         };
 
@@ -15,7 +16,18 @@ export const fetchClient = async (endpoint, method = 'GET', data = null, headers
         };
 
         if (data && method !== 'GET') {
-            options.body = JSON.stringify(data);
+            if (isFormData) {
+                const formBody =
+                    data instanceof FormData
+                        ? data
+                        : Object.entries(data).reduce((form, [key, value]) => {
+                            form.append(key, value);
+                            return form;
+                        }, new FormData());
+                options.body = formBody;
+            } else {
+                options.body = JSON.stringify(data);
+            }
         }
 
         const response = await fetch(`${BASE_URL}${endpoint}`, options);
@@ -36,7 +48,7 @@ export const fetchClient = async (endpoint, method = 'GET', data = null, headers
     }
 };
 
-// 🔹 Handle all types of errors centrally
+
 const handleFetchError = (error) => {
     if (error.status) {
         return { status: error.status, message: error.message };
