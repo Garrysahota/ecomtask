@@ -22,7 +22,6 @@ const ProductDetails = () => {
     const productDetails = async () => {
         try {
             let res = await ApiHelper.post('task_api.php', { product_id: productId }, true);
-            console.log('response:::', res);
             if (res?.status) {
                 setProduct(res?.data[0]);
             } else {
